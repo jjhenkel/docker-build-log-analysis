@@ -18,6 +18,21 @@ SELECT COUNT(*) FROM repositories;
 /* 'repository_files' stores file listings */
 SELECT COUNT(*) FROM repository_files;
 /* RESULTS: 437,716,767 (REALLY big table---400 Million rows!) */
+
+/* 'v_repository_files' includes classifications of files into:
+     - DevOps files (~11 different sub-classes)
+      - Docker (file/compose file)
+      - Travis 
+      - CircleCI
+      - Jenkins
+      - etc. 
+   How many repositories in this set have *some* kind of DevOps file?
+*/
+SELECT 
+  COUNT(DISTINCT repo_id)
+FROM v_repository_files
+WHERE maybe_devops = true;
+/* RESULTS: 288,873 repositories (or ~ 1 in every 4). */
 ```
 
 ## Goldilocks Repositories
