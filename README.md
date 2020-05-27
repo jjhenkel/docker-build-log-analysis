@@ -1,6 +1,16 @@
 # docker-build-log-analysis
 Experiments and notes related to analyzing Docker build logs and learning/associating search terms to failing logs.
 
+## Setup / Environment
+
+I try and write all of my tools/experiments with Docker---this helps later when I want to share/reproduce things. Nevertheless, there are some prerequisite tools I rely on:
+
+- A recent version of `make`
+- A recent version of `Docker`
+- `git` and other simple utilities
+
+I develop on various `*nix` machines (most `Debian/Ubuntu/CentOS`). This should be portable to `macOS` without much trouble. Even `Windows` would work (although driver/glue scripts would need to be ported or something like `Windows Subsystem for Linux` would need to be used).
+
 ## Preliminaries: Data
 
 To me, one of the things that will be crucial for this line of work is having a large set of candidate `<repository, Dockerfile>` pairs against which we can run `docker build ...` commands and capture logs. It's likely that a good portion of build attempts will fail and we can use that data for this study.
