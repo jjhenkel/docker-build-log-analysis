@@ -1,5 +1,5 @@
 export SHELL:=/bin/bash
-export SHELLOPTS:=$(if $(SHELLOPTS),$(SHELLOPTS):)pipefail:errexit
+export SHELLOPTS:=$(if $(SHELLOPTS),$(SHELLOPTS):)errexit
 
 .ONESHELL:
 
@@ -60,19 +60,36 @@ build-dockerception: ## Builds the dockerception tool.
 	  docker build -t "$${IMAGE_NAME}" "${ROOT_DIR}/tools/dockerception"
 	fi
 
-.PHONY: test-dockerception-random
-test-dockerception-random: | build-dockerception ## Tests dockerception on a random repository.
+.PHONY: check-test-target
+check-test-target:
+ifndef TEST_TARGET
+	$(error TEST_TARGET is a required parameter. (Usage: TEST_TARGET=random/<sha commit hash>.))
+endif
+
+.PHONY: test-dockerception
+test-dockerception: | check-test-target build-dockerception ## Tests dockerception on a repository (user-supplied or random).
 	@IMAGE_NAME="$(shell whoami)/dbla--dockerception:$(shell git rev-parse HEAD)"
-	docker run \
+
+	@if [ "${TEST_TARGET}" = "random" ] || [ "${TEST_TARGET}" = "r" ]; then
+		INPUT_LINE="$$(                                             \
+			cat "${ROOT_DIR}/data/repo-metadata/goldilocks-repos.csv" \
+			| head -n -1                                              \
+			| shuf -n1                                                \
+		)"
+	else
+		INPUT_LINE="$$(                                             \
+			cat "${ROOT_DIR}/data/repo-metadata/goldilocks-repos.csv" \
+			| head -n -1                                              \
+			| grep "$${TEST_TARGET}"                                  \
+			| head -n1                                                \
+		)"
+	fi
+
+	@docker run \
 	  -it --rm \
 		-e USER_ID="$(shell id -u)" \
 		-e GROUP_ID="$(shell id -g)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v "${ROOT_DIR}/data/build-results":/mnt/outputs \
 		"$${IMAGE_NAME}" \
-			'$(shell \
-			    cat "${ROOT_DIR}/data/repo-metadata/goldilocks-repos.csv" \
-					| head -n -1 \
-					| shuf \
-					| head -n1
-			)'
+			"$${INPUT_LINE}"
