@@ -31,3 +31,25 @@ Well, for now, it looks like I either need to find something very clever or acce
 In `tools/dockerception` there's an image that will just use `DooD` to build an arbitrary Dockerfile from our dataset in its original context.
 
 
+## Dockerception
+
+This tool does the following steps (for now):
+
+1. As input, receives a line from `goldilocks-repos.csv`
+
+2. Clones the repo specified by the input line and checks said repo out to the commit SHA specified in the input line using `git checkout <sha>` 
+
+3. Logs the results of clone/checkout and the original input line (clone logs are `.git-log.txt` input line/meta saved as `.meta.json`). A time stamp is appended to the `.meta.json` file.
+
+4. Enters the `/target` directory in the container (which is where the cloned repository lives) and finds a file matching `find /target -type f -iname *dockerfile*`. Attempts to run `docker build ... ` on the matching file.
+
+5. Saves a log of the attempted build (`.build-log.txt`).
+
+6. If the build succeeds, get `docker history ... ` and stores as a JSON array in `.history.json`. Also saves the exit code in `.succeeded.txt` (which will be `0`).
+
+7. If the build fails, saves the exit code in `.failed.txt`.
+  
+Right now, this tool creates a directory indexed by the unique `repo_id` field (from the input CSV line) to store these artifacts. The files are named according the the SHA `repo_commit` hash (also found in the input CSV line).
+
+
+
