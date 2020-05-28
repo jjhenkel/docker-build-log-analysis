@@ -1,2 +1,3 @@
 data/build-results/*
 !data/build-results/.gitkeep
+recordings/
