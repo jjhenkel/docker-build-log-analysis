@@ -73,13 +73,13 @@ test-dockerception: | check-test-target build-dockerception ## Tests dockercepti
 	@if [ "${TEST_TARGET}" = "random" ] || [ "${TEST_TARGET}" = "r" ]; then
 		INPUT_LINE="$$(                                             \
 			cat "${ROOT_DIR}/data/repo-metadata/goldilocks-repos.csv" \
-			| head -n -1                                              \
+			| tail -n +2                                              \
 			| shuf -n1                                                \
 		)"
 	else
 		INPUT_LINE="$$(                                             \
 			cat "${ROOT_DIR}/data/repo-metadata/goldilocks-repos.csv" \
-			| head -n -1                                              \
+			| tail -n +2                                              \
 			| grep "$${TEST_TARGET}"                                  \
 			| head -n1                                                \
 		)"

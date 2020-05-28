@@ -87,7 +87,7 @@ WHERE R.repo_id IN (
 Next, I do a sanity check on the downloaded CSV:
 
 ```bash
-cat ./data/repo-metadata/goldilocks-repos.csv | awk -F',' '{ print $1 }' | head -n-1  | wc -l
+cat ./data/repo-metadata/goldilocks-repos.csv | awk -F',' '{ print $1 }' | tail -n +2  | wc -l
 ```
 
 It happened that this returned `32,469` which is more than expected? Further investigation reveals that one GitHub repository in the dataset had line breaks in its description field that ended up in the CSV. I manually fixed this (although CSV allows for line breaks in double quoted fields, I don't trust every arbitrary CSV reader to support that).
