@@ -1,0 +1,17 @@
+FROM gcr.io/kaniko-project/executor:v0.22.0
+
+FROM alpine
+
+RUN apk add --no-cache coreutils git curl openssh
+
+COPY --from=0 /kaniko/executor /kaniko/executor
+COPY --from=0 /kaniko/ssl/certs/ /kaniko/ssl/certs/
+
+ENV HOME /root
+ENV USER /root
+ENV PATH /bin:/usr/bin:/usr/local/bin
+ENV SSL_CERT_DIR=/kaniko/ssl/certs
+
+COPY . /app
+
+ENTRYPOINT [ "/app/entrypoint.sh" ]

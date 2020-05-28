@@ -50,3 +50,38 @@ build-driver: ## Builds the `dbla` driver.
 	else
 	  docker build -t "$${IMAGE_NAME}" "${ROOT_DIR}"
 	fi
+
+.PHONY: build-dockerception
+build-dockerception: ## Builds the dockerception tool.
+	@IMAGE_NAME="$(shell whoami)/dbla--dockerception:$(shell git rev-parse HEAD)"
+	if [[ -z "${DBLA_DEBUG}" ]]; then
+	  docker build -t "$${IMAGE_NAME}" "${ROOT_DIR}/tools/dockerception" &> /dev/null
+	else
+	  docker build -t "$${IMAGE_NAME}" "${ROOT_DIR}/tools/dockerception"
+	fi
+
+.PHONY: test-dockerception-random
+test-dockerception-random: | build-dockerception ## Tests dockerception on a random repository.
+	@IMAGE_NAME="$(shell whoami)/dbla--dockerception:$(shell git rev-parse HEAD)"
+	@LINE=$(shell \
+	  cat "${ROOT_DIR}/data/repo-metadata/goldilocks-repos.csv" \
+		| shuf \
+		| head -n1 \
+	)
+	@REPO_GIT_URL=$$(
+		echo "$${LINE}" | awk -F',' '{ print $$14 }'
+	)
+	@REPO_COMMIT_SHA=$$(
+		echo "$${LINE}" | awk -F',' '{ print $$24 }'
+	)
+	@REPO_ID=$$(
+		echo "$${LINE}" | awk -F',' '{ print $$1 }'
+	)
+	docker run \
+	  -it --rm \
+		-e USER_ID=$(id -u) \
+		-e GROUP_ID=$(id -g ) \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v "${ROOT_DIR}/data/build-results":/mnt/outputs \
+		"$${IMAGE_NAME}" \
+			"$${REPO_GIT_URL}" "$${REPO_COMMIT_SHA}" "$${REPO_ID}"
