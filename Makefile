@@ -60,17 +60,17 @@ build-dockerception: ## Builds the dockerception tool.
 	  docker build -t "$${IMAGE_NAME}" "${ROOT_DIR}/tools/dockerception"
 	fi
 
-.PHONY: check-test-target
-check-test-target:
-ifndef TEST_TARGET
-	$(error TEST_TARGET is a required parameter. (Usage: TEST_TARGET=random/<sha commit hash>.))
+.PHONY: check-target
+check-target:
+ifndef TARGET
+	$(error TARGET is a required parameter. (Usage: TARGET=random/<sha commit hash>.))
 endif
 
-.PHONY: test-dockerception
-test-dockerception: | check-test-target build-dockerception ## Tests dockerception on a repository (user-supplied or random).
+.PHONY: run-dockerception
+run-dockerception: | check-target build-dockerception ## Tests dockerception on a repository (user-supplied or random).
 	@IMAGE_NAME="$(shell whoami)/dbla--dockerception:$(shell git rev-parse HEAD)"
 
-	@if [ "${TEST_TARGET}" = "random" ] || [ "${TEST_TARGET}" = "r" ]; then
+	@if [ "${TARGET}" = "random" ] || [ "${TARGET}" = "r" ]; then
 		INPUT_LINE="$$(                                             \
 			cat "${ROOT_DIR}/data/repo-metadata/goldilocks-repos.csv" \
 			| tail -n +2                                              \
@@ -80,13 +80,13 @@ test-dockerception: | check-test-target build-dockerception ## Tests dockercepti
 		INPUT_LINE="$$(                                             \
 			cat "${ROOT_DIR}/data/repo-metadata/goldilocks-repos.csv" \
 			| tail -n +2                                              \
-			| grep "$${TEST_TARGET}"                                  \
+			| grep "$${TARGET}"                                  \
 			| head -n1                                                \
 		)"
 	fi
 
 	@docker run \
-	  -it --rm \
+	  --rm \
 		-e USER_ID="$(shell id -u)" \
 		-e GROUP_ID="$(shell id -g)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \

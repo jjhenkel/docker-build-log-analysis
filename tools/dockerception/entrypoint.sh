@@ -67,24 +67,39 @@ find /target -type f  &> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/all-files.txt"
 find /target -type d &> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/all-directories.txt"
 
 echo "[DBLA]   + Building docker image..."
-timeout -k 60 1800 docker build --rm -t dbla-temporary -f "${DOCKERFILE}" /target \
-  &> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/build-log.txt"
+timeout -s SIGKILL 1800 stdbuf -o0 -e0 docker build --rm -t "dbla-temporary:${REPO_ID}" -f "${DOCKERFILE}" /target \
+  > "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/build-log-stdout.txt" \
+  2> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/build-log-stderr.txt"
+RESULT="$?"
 
-if [ $? -eq 0 ]; then
+if [ "${RESULT}" -eq 0 ]; then
   echo "[DBLA]      + Build Succeeded!"
   echo "Exit Code: $?" \
-    > "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/succeeded.txt"
-  docker history --no-trunc --format '{{json .}}' dbla-temporary \
+    > "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/result-succeeded.txt"
+  docker history --no-trunc --format '{{json .}}' "dbla-temporary:${REPO_ID}" \
     | jq -s '.' &> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/history.json"
   echo "[DBLA]      + Image history saved."
+elif [ "${RESULT}" -eq 137 ]; then
+  echo "Exit Code: $?" \
+    > "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/result-timed-out.txt"
+  echo "[DBLA]      - Build Timeout!"
 else
   echo "Exit Code: $?" \
-    > "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/failed.txt"
+    > "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/result-build-failed.txt"
   echo "[DBLA]      - Build Failed!"
 fi
 
 echo "[DBLA]   + Cleanup..."
-docker rmi dbla-temporary &> /dev/null || true 
+rm -f "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt"
+touch "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt"
+for IMAGE in $(docker images -q); do
+  DEPS="$(/app/docker-find-dependants.sh "${IMAGE}")"
+  if echo "${DEPS}" | grep -q "dbla-temporary:${REPO_ID}"; then
+    echo "${DEPS}" | grep 'Image' | awk '{ print $2 }' >> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt"
+  fi 
+done
+docker rmi $(cat "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt") \
+  &> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps-cleanup-log.txt"
 
 echo "[DBLA]   + Extracting file chunks..."
 /app/chunk.sh "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}"
