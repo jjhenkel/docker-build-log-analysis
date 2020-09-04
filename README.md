@@ -22,6 +22,28 @@ We provide the following example notebook for these tasks: [link to Google Colla
 
 Coming soon (secondary repository with further tools/scripts --- currently undergoing cleanup).
 
+### Accepted PRs 
 
+Here's a listing of links to (accepted) pull requests made with Shipwright:
+
+* https://github.com/AjuntamentdeBarcelona/decidim-barcelona/pull/321
+* https://github.com/realpython/flask-image-search/pull/2
+* https://github.com/LLNL/merlin/pull/254
+* https://github.com/fisadev/zombsole/pull/11
+* https://github.com/xlight/docker-php7-swoole/pull/2
+* https://github.com/castlamp/zenbership/pull/226
+* https://github.com/edwin-zvs/email-providers/pull/9
+* https://github.com/ex0dus-0x/doxbox/pull/12
+* https://github.com/zhihu/kids/pull/58
+* https://github.com/cxmcc/webinspect/pull/1
+* https://github.com/thegroovebox/groovebox.org/pull/10
+* https://github.com/quasoft/backgammonjs/pull/26
+* https://github.com/gitevents/core/pull/216
+* https://github.com/htilly/zenmusic/pull/56
+* https://github.com/freedomvote/freedomvote/pull/332
+* https://github.com/enomotokenji/pytorch-Neural-Style-Transfer/pull/3
+* https://github.com/yesodweb/yesodweb.com-content/pull/255
+* https://github.com/anurag/fastai-course-1/pull/14
+* https://github.com/gjovanov/facer/pull/18
 
 
