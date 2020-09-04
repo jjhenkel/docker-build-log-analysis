@@ -22,9 +22,11 @@ We provide the following example notebook for these tasks: [link to Google Colla
 
 Coming soon (secondary repository with further tools/scripts --- currently undergoing cleanup).
 
-### Accepted PRs 
+## Pull Requests
 
-Here's a listing of links to (accepted) pull requests made with Shipwright:
+Here's a listing of links to pull requests made with Shipwright:
+
+### Accepted (19)
 
 * https://github.com/AjuntamentdeBarcelona/decidim-barcelona/pull/321
 * https://github.com/realpython/flask-image-search/pull/2
@@ -46,4 +48,34 @@ Here's a listing of links to (accepted) pull requests made with Shipwright:
 * https://github.com/anurag/fastai-course-1/pull/14
 * https://github.com/gjovanov/facer/pull/18
 
+### Rejected (3)
 
+* https://github.com/voxpupuli/puppet-stash/pull/193
+* https://github.com/voxpupuli/puppet-mrepo/pull/117
+* https://github.com/voxpupuli/puppet-fail2ban/pull/156
+
+### In Review (23)
+
+* https://github.com/CubiCasa/CubiCasa5k/pull/22
+* https://github.com/blueboxgroup/ursula/pull/3005
+* https://github.com/morecobol/cobol.run/pull/2
+* https://github.com/avilaton/gtfseditor/pull/222
+* https://github.com/domcode/rafflers/pull/171
+* https://github.com/ricktorzynski/ocr-tesseract-docker/pull/9
+* https://github.com/danitome24/silex-ddd-skeleton/pull/4
+* https://github.com/knjcode/pytorch-finetuner/pull/2
+* https://github.com/nabu-catalog/nabu/pull/687
+* https://github.com/voxpupuli/puppet-puppetboard/pull/289
+* https://github.com/agermanidis/OpenGPT-2/pull/6
+* https://github.com/airesis/airesis/pull/201
+* https://github.com/ynnadkrap/balldontlie/pull/41
+* https://github.com/symbiod/juniorjobs/pull/381
+* https://github.com/ello/wtf/pull/125
+* https://github.com/willywos/jobbyjobjob/pull/50
+* https://github.com/grinnellplans/GrinnellPlans/pull/158
+* https://github.com/yunalading/yuncms/pull/39
+* https://github.com/JensErat/docker-selfoss/pull/14
+* https://github.com/worknenjoy/truppie/pull/155
+* https://github.com/gochain/rpc-proxy/pull/56
+* https://github.com/holderdeord/hdo-site/pull/692
+* https://github.com/capn-freako/PyAMI/pull/9
