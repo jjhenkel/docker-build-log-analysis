@@ -27,9 +27,27 @@ REPO_COMMIT=$(
   echo "${1}" | mlr ${MLR_ARGS} cut -f 24
 )
 
-echo "[DBLA]   + Cloning '${REPO_URL}'..."
 
 mkdir -p "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}"
+
+if [ -f "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/result-succeeded.txt" ]; then
+  echo "[DBLA]   + Already have '${REPO_URL}'..."
+  exit 0
+elif [ -f "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/result-timed-out.txt" ]; then 
+  echo "[DBLA]   + Already have '${REPO_URL}'..."
+  exit 0
+elif [ -f "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/result-build-failed.txt" ]; then 
+  if grep -Evq '(sha256:[a-z0-9]{64}|unable to prepare context|pull access denied)' "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/build-log-stderr.txt"; then
+    echo "[DBLA]   + Already have (good fail) '${REPO_URL}'..."
+    exit 0
+  else
+    echo "[DBLA]   + Re-do (bad fail) '${REPO_URL}'..."
+  fi
+else
+    echo "[DBLA]   + New '${REPO_URL}'..."
+fi
+
+echo "[DBLA]   + Cloning '${REPO_URL}'..."
 
 echo "${REPO_COMMIT}" \
   &> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/commit-sha.txt"
@@ -89,17 +107,17 @@ else
   echo "[DBLA]      - Build Failed!"
 fi
 
-echo "[DBLA]   + Cleanup..."
-rm -f "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt"
-touch "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt"
-for IMAGE in $(docker images -q); do
-  DEPS="$(/app/docker-find-dependants.sh "${IMAGE}")"
-  if echo "${DEPS}" | grep -q "dbla-temporary:${REPO_ID}"; then
-    echo "${DEPS}" | grep 'Image' | awk '{ print $2 }' >> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt"
-  fi 
-done
-docker rmi $(cat "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt") \
-  &> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps-cleanup-log.txt"
+# echo "[DBLA]   + Cleanup..."
+# rm -f "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt"
+# touch "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt"
+# for IMAGE in $(docker images -q); do
+#   DEPS="$(/app/docker-find-dependants.sh "${IMAGE}")"
+#   if echo "${DEPS}" | grep -q "dbla-temporary:${REPO_ID}"; then
+#     echo "${DEPS}" | grep 'Image' | awk '{ print $2 }' >> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt"
+#   fi 
+# done
+# docker rmi $(cat "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps.txt") \
+#   &> "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}/image-deps-cleanup-log.txt"
 
 echo "[DBLA]   + Extracting file chunks..."
 /app/chunk.sh "/mnt/outputs/${REPO_ID}/${REPO_COMMIT}"
